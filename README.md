@@ -103,9 +103,7 @@ e. Click Next to select an available template (do not click Finish).
 
 25. Modify the project-spec/meta-user/recipes-apps/<app_name>/<app_name>.bb to install the remote processor firmware in the RootFS. (In my case as you can see below, I named my firmware into matrix.elf
 
-#
-# This file is the matrix.elf recipe.
-#
+This file is the matrix.elf recipe.
 
 SUMMARY = "Simple matrix.elf application"
 SECTION = "PETALINUX/apps"
@@ -140,3 +138,99 @@ do_install() {
 
 FILES_${PN} = "/lib/firmware/matrix.elf"
 	 
+26. Configure the kernel options to work with OpenAMP. 
+
+a. Start the PetaLinux Kernel configuration tool:
+
+         user@linuxworkstation ~ $ petalinux-config -c kernel 
+
+b. Enable loadable module support:
+
+[*] Enable loadable module support --->
+
+c. Enable user space firmware loading support:
+
+Device Drivers --->
+Generic Driver Options --->
+<*> Userspace firmware loading support
+
+d. Enable the remoteproc driver support: 
+
+Device Drivers --->
+Remoteproc drivers --->
+<M> Support ZYNQ remoteproc
+
+27. Enable all of the modules and applications in the RootFS:
+
+a. Open the RootFS configuration menu:
+
+         user@linuxworkstation ~ $ petalinux-config -c rootfs
+
+b. Ensure the OpenAMP applications and rpmsg modules are enabled:
+
+Filesystem Packages --->
+misc --->
+packagegroup-petalinux-openamp --->
+[*] packagegroup-petalinux-openamp
+
+28. Exit the rootfs configuration and we are ready to edit our device tree overlay. For this change your directory into; 
+
+         user@linuxworkstation ~ $ cd /path/to/your/project/project-spec/meta-user/recipes-bsp/device-tree/files/openamp-overlay.dtsi
+
+29. Edit the device tree overlay as follows:
+
+/ {
+	reserved-memory {
+		#address-cells = <1>;
+		#size-cells = <1>;
+		ranges;
+		rproc_0_reserved: rproc@3e000000 {
+			no-map;
+			reg =  <0x3e000000 0x01000000>;
+		};
+	};
+
+	amba {
+		elf_ddr_0: ddr@0 {
+			compatible = "mmio-sram";
+			reg = <0x3e000000 0x400000>;
+		};
+	};
+	remoteproc0: remoteproc@0 {
+		compatible = "xlnx,zynq_remoteproc";
+		firmware = "firmware";
+		vring0 = <15>;
+		vring1 = <14>;
+		srams = <&elf_ddr_0>;
+
+	};
+};
+
+30. We are ready to build our application !!! Change in to your project directory and build your project as follows 
+
+         user@linuxworkstation ~ $ petalinux-build
+
+31. If everything goes according to the plan you should be able to build project successfully, now next step is to create bootloader for the SD Card. Go to /images/linux directory. 
+
+         user@linuxworkstation ~ $ petalinux-package --boot --fsbl <FSBL IMAGE> --fpga <FPGA BITSTREAM> --u-boot 
+
+(FSBL image is the <zynq_fsbl.elf> file and FPGA bitstream is the <download.bit> file)
+
+32. Everything is ready for the boot on the hardware. Now we need an SD card of the minimum size of 4 GB in order to load our linux system. To make the proper partioning, we need a tool such as GPARTED. Install GPARTED and configure the SD card into 2 sections. First section must be aliased as BOOT and should be 1024 MB of size and FAT32 file type. Make sure to leave 4 MB of preceding place before the first partition. Second partitition must be aliased as rootfs and should have the 4 MB of preceding size and should take all of the remaining space on the SD Card. After our SD card is ready copy image.ub and BOOT.bin into your BOOT part of the partition. 
+
+         user@linuxworkstation ~ $ cp BOOT.bin /media/<username>/BOOT 
+         user@linuxworkstation ~ $ cp image.ub /media/<username>/BOOT
+
+33. Copy rootfs.cpio, rootfs.cpio.gz and rootfs.tar.gz into your rootfs partition
+
+         user@linuxworkstation ~ $ sudo cp rootfs.cpio /media/<username>/rootfs
+         user@linuxworkstation ~ $ sudo cp rootfs.cpio.gz /media/<username>/rootfs
+         user@linuxworkstation ~ $ sudo cp rootfs.tar.gz /media/<username>/rootfs
+
+34. Untar the tar file under your rootfs partition
+
+         user@linuxworkstation ~ $ sudo tar xvf rootfs.tar.gz 
+
+35. We are good to go !!! Plug your SD card into ZedBoard and plug your USB cable into UART port of the board. Open up a terminal (I preffer GTKTERM) and set the baudrate into 115200. After board gets ready type "run bootcmd", the board should start booting up and a login screen should appear. Login with the user name as root and password as root. 
+
+ 
