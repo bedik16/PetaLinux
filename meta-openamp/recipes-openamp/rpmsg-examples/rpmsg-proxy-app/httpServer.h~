@@ -1,0 +1,23 @@
+/*
+ * To change this license header, choose License Headers in Project Properties.
+ * To change this template file, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/* 
+ * File:   httpServer.h
+ * Author: brehm
+ *
+ * Created on April 19, 2018, 11:03 AM
+ */
+
+#ifndef HTTPSERVER_H
+#define HTTPSERVER_H
+
+void startHttpServer(void);
+int httpServerThread(void);
+
+
+
+#endif /* HTTPSERVER_H */
+
