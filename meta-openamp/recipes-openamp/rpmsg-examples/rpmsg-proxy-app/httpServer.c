@@ -1,21 +1,3 @@
-/**
- * webserver.c -- A webserver written in C
- * 
- * Test with curl (if you don't have it, install it):
- * 
- *    curl -D - http://localhost:3490/
- *    curl -D - http://localhost:3490/d20
- *    curl -D - http://localhost:3490/date
- * 
- * You can also test the above URLs in your browser! They should work!
- * 
- * Posting Data:
- * 
- *    curl -D - -X POST -H 'Content-Type: text/plain' -d 'Hello, sample data!' http://localhost:3490/save
- * 
- * (Posting data is harder to test from a browser.)
- */
-
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -48,6 +30,7 @@ int httpServerThread(void)  {
     
     if (sockfd < 0) {
        fprintf(stderr,"ERROR opening socket");
+       printf(stderr,"ERROR opening socket");
        return -1;
     }
     
@@ -101,7 +84,7 @@ int httpServerThread(void)  {
 }
 
 void startHttpServer(void) {
-  printf("SERVER IS BEING STARTED");
+  printf("SERVER IS BEING STARTED\n");
   httpServerThread();
     
 //    pthread_t serverThread;
@@ -191,6 +174,7 @@ int handleRequest (int sock)
    
    if (n < 0) { 
        fprintf(stderr,"ERROR reading from socket");
+       printf(stderr,"ERROR reading from socket");
        return -1;
    }
    
@@ -207,6 +191,7 @@ int handleRequest (int sock)
     else {
         fprintf(stderr, "Unknown command.\n");
         sprintf(response, "FAIL\r\nUnknown command.\n");
+        printf(response, "FAIL\r\nUnknown command.\n");
         goto sendResponse;
     }
         /* From the start position, set the end pointer to the first white-space character found in the string. */
@@ -214,6 +199,7 @@ int handleRequest (int sock)
    //check if there is a path
    if(*start!='/') {
        sprintf(response, "FAIL\r\nCommand missing or incorrect formatted.\n");
+       printf(response, "FAIL\r\nCommand missing or incorrect formatted.\n");
        goto sendResponse;
    }
    
@@ -277,6 +263,7 @@ int handleRequest (int sock)
         */
        if(*end != '/') {
             sprintf(response, "FAIL\r\nArgument missing or incorrect.\n");
+            printf(response, "FAIL\r\nArgument missing or incorrect.\n");
             free(command);
             free(path);
             goto sendResponse;
@@ -290,6 +277,7 @@ int handleRequest (int sock)
        
        if(len<=0){
            sprintf(response, "FAIL\r\nArgument missing or incorrect. Argument length is %d.\n",len-1);
+           printf(response, "FAIL\r\nArgument missing or incorrect. Argument length is %d.\n",len-1);
            free(command);
            free(path);
            goto sendResponse;
@@ -301,12 +289,14 @@ int handleRequest (int sock)
        arg[len] = '\0';
        
        sprintf(response,"%s\n", commandInterpreter(command, arg));
+       printf(response,"%s\n", commandInterpreter(command, arg));
        free(command);
        free(arg);
    }
 
    else  {
        sprintf(response, "ERROR: Can't parse set/get command, or command unknown.\n");
+       printf(response, "ERROR: Can't parse set/get command, or command unknown.\n");
        goto sendResponse;
    }
    free(path);

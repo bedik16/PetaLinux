@@ -43,6 +43,7 @@ char *getTime(char *arg) {
     tm_info = localtime(&timer);
 
     strftime(buffer, 26, "%Y-%m-%d %H:%M:%S", tm_info);
+    printf("get time function is called");
    
     return buffer;
 }
@@ -52,6 +53,7 @@ char *setPwm(char *arg) {
    
    //   if(setPWMDutyCycle(atoi(arg),1))
         sprintf(buffer,"OK - Set PWM to %s",arg);
+	printf("OK - Set PWM to %s",arg);
 	//   else
 	// sprintf(buffer,"FAIL - Set PWM to %s",arg);
    return buffer;
