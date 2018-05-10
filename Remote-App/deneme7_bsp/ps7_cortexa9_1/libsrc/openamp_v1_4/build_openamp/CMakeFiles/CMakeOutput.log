@@ -1,0 +1,17 @@
+The target system is: Generic -  - arm
+The host system is: Linux - 4.13.0-38-generic - x86_64
+Determining if files stdatomic.h exist passed with the following output:
+Change Dir: /home/berk/workspace/deneme7_bsp/ps7_cortexa9_1/libsrc/openamp_v1_4/build_openamp/CMakeFiles/CMakeTmp
+
+Run Build Command:"/usr/bin/make" "cmTC_5938a/fast"
+/usr/bin/make -f CMakeFiles/cmTC_5938a.dir/build.make CMakeFiles/cmTC_5938a.dir/build
+make[1]: Entering directory '/home/berk/workspace/deneme7_bsp/ps7_cortexa9_1/libsrc/openamp_v1_4/build_openamp/CMakeFiles/CMakeTmp'
+Building C object CMakeFiles/cmTC_5938a.dir/CheckIncludeFiles.c.obj
+/opt/Xilinx/SDK/2017.4/gnu/aarch32/lin/gcc-arm-none-eabi/bin/arm-none-eabi-gcc   -O2 -c -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -nostartfiles -Wall -Wextra -DUNDEFINE_FILE_OPS -DUSE_AMP=1 -I/home/berk/workspace/deneme7_bsp/ps7_cortexa9_1/include -Wall -Wextra -c   -o CMakeFiles/cmTC_5938a.dir/CheckIncludeFiles.c.obj   -c /home/berk/workspace/deneme7_bsp/ps7_cortexa9_1/libsrc/openamp_v1_4/build_openamp/CMakeFiles/CMakeTmp/CheckIncludeFiles.c
+Linking C executable cmTC_5938a
+/opt/Xilinx/SDK/2017.4/tps/lnx64/cmake-3.3.2/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5938a.dir/link.txt --verbose=1
+/opt/Xilinx/SDK/2017.4/gnu/aarch32/lin/gcc-arm-none-eabi/bin/arm-none-eabi-gcc  -O2 -c -mcpu=cortex-a9 -mfpu=vfpv3 -mfloat-abi=hard -nostartfiles -Wall -Wextra -DUNDEFINE_FILE_OPS -DUSE_AMP=1 -I/home/berk/workspace/deneme7_bsp/ps7_cortexa9_1/include -Wall -Wextra -c    CMakeFiles/cmTC_5938a.dir/CheckIncludeFiles.c.obj  -o cmTC_5938a  
+arm-none-eabi-gcc: warning: CMakeFiles/cmTC_5938a.dir/CheckIncludeFiles.c.obj: linker input file unused because linking not done
+make[1]: Leaving directory '/home/berk/workspace/deneme7_bsp/ps7_cortexa9_1/libsrc/openamp_v1_4/build_openamp/CMakeFiles/CMakeTmp'
+
+

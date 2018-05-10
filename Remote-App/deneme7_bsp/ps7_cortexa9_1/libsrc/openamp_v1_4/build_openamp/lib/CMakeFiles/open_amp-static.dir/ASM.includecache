@@ -1,0 +1,10 @@
+#IncludeRegexLine: ^[ 	]*#[ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+/home/berk/workspace/deneme7_bsp/ps7_cortexa9_1/libsrc/openamp_v1_4/src/open-amp/lib/remoteproc/drivers/zynq_a9_trampoline.S
+
