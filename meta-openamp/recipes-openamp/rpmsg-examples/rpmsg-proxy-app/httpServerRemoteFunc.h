@@ -17,4 +17,3 @@
 char *commandInterpreter(char *cmd, char *arg);
 
 #endif /* HTTPSERVERREMOTEFUNC_H */
-

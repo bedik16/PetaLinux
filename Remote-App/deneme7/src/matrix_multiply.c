@@ -102,6 +102,8 @@ typedef struct _matrix {
 /* Local variables */
 static matrix matrix_array[NUM_MATRIX];
 static matrix matrix_result;
+static int master_int;
+static int slave_result;
 
 static struct rpmsg_endpoint *rp_ept;
 static struct remote_proc *proc = NULL;
@@ -146,19 +148,50 @@ static void rpmsg_read_cb(struct rpmsg_channel *rp_chnl, void *data, int len,
 		evt_chnl_deleted = 1;
 		return;
 	}
+	else if((*(unsigned int *)data) > 100)
+	{
+		slave_result = 250;
+	}
+	else
+		slave_result = 15;
 
-	memcpy(matrix_array, data, len);
+	//memcpy(matrix_array, data, len);
 	/* Process received data and multiple matrices. */
-	Matrix_Multiply(&matrix_array[0], &matrix_array[1], &matrix_result);
+	//Matrix_Multiply(&matrix_array[0], &matrix_array[1], &matrix_result);
 
 
 
 
 	/* Send the result of matrix multiplication back to master. */
-	if (rpmsg_send(rp_chnl, &matrix_result, sizeof(matrix)) < 0) {
+	if (rpmsg_send(rp_chnl, &slave_result, sizeof(slave_result)) < 0) {
 		LPERROR("rpmsg_send failed\n");
 	}
 }
+
+/*
+static void rpmsg_read_cb(struct rpmsg_channel *rp_chnl, void *data, int len,
+			  void *priv, unsigned long src)
+{
+	(void)priv;
+	(void)src;
+
+	if ((*(unsigned int *)data) == SHUTDOWN_MSG) {
+		evt_chnl_deleted = 1;
+		return;
+	}
+
+	memcpy(matrix_array, data, len);
+//	/* Process received data and multiple matrices. */
+//	Matrix_Multiply(&matrix_array[0], &matrix_array[1], &matrix_result);
+
+
+
+
+	/* Send the result of matrix multiplication back to master. */
+//	if (rpmsg_send(rp_chnl, &matrix_result, sizeof(matrix)) < 0) {
+//		LPERROR("rpmsg_send failed\n");
+//	}
+//}
 
 static void rpmsg_channel_created(struct rpmsg_channel *rp_chnl)
 {

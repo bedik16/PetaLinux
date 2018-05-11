@@ -26,6 +26,7 @@ struct _matrix {
 	unsigned int elements[MATRIX_SIZE][MATRIX_SIZE];
 };
 
+
 static void matrix_print(struct _matrix *m)
 {
 	int i, j;
@@ -38,6 +39,14 @@ static void matrix_print(struct _matrix *m)
 			printf(" %d ", (unsigned int)m->elements[i][j]);
 		printf("\r\n");
 	}
+}
+
+
+static void slave_print(int *slave_data)
+{
+  printf(" \r\n Master Linux is printing slave result \r\n");
+  printf(" %d ", *slave_data);
+  printf("\r\n");
 }
 
 static void generate_matrices(int num_matrices,
@@ -75,6 +84,7 @@ static pthread_t ui_thread, compute_thread, http_thread;
 static pthread_mutex_t sync_lock;
 
 static int fd, compute_flag;
+static int slave_data, master_data;
 static struct _matrix i_matrix[2];
 static struct _matrix r_matrix;
 
@@ -112,17 +122,18 @@ void *ui_thread_entry(void *ptr)
 			pthread_mutex_unlock(&sync_lock);
 
 			printf("\r\n Compute thread unblocked .. \r\n");
-			printf(" The compute thread is now blocking on");
+			printf(" The compute thread is now blocking on \r\n");
 			printf("a read() from rpmsg device \r\n");
 			printf("\r\n Generating random matrices now ... \r\n");
 
-			generate_matrices(2, 6, i_matrix);
+			//generate_matrices(2, 6, i_matrix);
+			master_data = 120;
 
-			printf("\r\n Writing generated matrices to rpmsg ");
+			printf("\r\n Writing master data to rpmsg ");
 			printf("rpmsg device, %d bytes written .. \r\n",
-					sizeof(i_matrix));
+					sizeof(master_data));
 
-			write(fd, i_matrix, sizeof(i_matrix));
+			write(fd, &master_data, sizeof(master_data));
 
 			/* adding this so the threads
 			dont overlay the strings they print */
@@ -150,13 +161,13 @@ void *compute_thread_entry(void *ptr)
 	while (compute_flag == 1) {
 
 		do {
-			bytes_rcvd = read(fd, &r_matrix, sizeof(r_matrix));
-		} while ((bytes_rcvd < sizeof(r_matrix)) || (bytes_rcvd < 0));
+			bytes_rcvd = read(fd, &slave_data, sizeof(slave_data));
+		} while ((bytes_rcvd < sizeof(slave_data)) || (bytes_rcvd < 0));
 
 		printf("\r\n Received results! - %d bytes from ", bytes_rcvd);
 		printf("rpmsg device (transmitted from remote context) \r\n");
 
-		matrix_print(&r_matrix);
+		slave_print(&slave_data);
 
 		pthread_mutex_lock(&sync_lock);
 	}
